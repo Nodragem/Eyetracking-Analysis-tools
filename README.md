@@ -18,9 +18,9 @@ Each Dataframe in the HDF5 file needs to represent a block of trials. For instan
 
 The column names of each dataframe should be the same and should ideally looks like that:
 
-|TRIAL_ID|	Fixation0	|Fixation0_DIR|	Fixation0_ECC|	S11	| S11_DIR	|S11_ECC|	TRIAL_CODE|	TRIAL_TYPE|	ps	|time	|vx	|vy	|xp|	yp|
-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
-|1.0 |	ON	|0.0	|0.0|	OFF|	158.0|	7.0| 11111.0|	2.0|	6125.0|	0.0|	65.1|	-26.8|	447.4|	648.6|
+| TRIAL_ID |	Fixation0	| Fixation0_DIR |	Fixation0_ECC |	S11	| S11_DIR	|S11_ECC | TRIAL_CODE |	TRIAL_TYPE |	ps	| time	| vx	| vy	| xp |	yp |
+|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
+| 1.0 |	ON	| 0.0	| 0.0|	OFF |	158.0 |	7.0 | 11111.0 |	2.0 |	6125.0 |	0.0 |	65.1 |	-26.8 |	447.4 |	648.6 |
 |...|...|...|...|...|...|...|...|...|...|...|...|...|...|...|
 
 Where S1 and Fixation are the user-defined (defined by you) name of Stimuli which are used during the experiment. This nomenclature is actually used by the ParadigmTools library. More details on the nomenclature can be found in that library doc.
