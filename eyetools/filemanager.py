@@ -138,7 +138,7 @@ def selectName(expression, to_avoid, istore, suffixe = ""):
     file_selector = [e+suffixe for e in expression]
     to_avoid = to_avoid
     storekeys = istore.keys()
-    list_names = [key[1:] for key in storekeys  if any(string in key for string in file_selector)] ## e[1:] to remove the / in front of the name
+    list_names = [key[1:] for key in storekeys  if all(string in key for string in file_selector)] ## e[1:] to remove the / in front of the name
     list_names = [e for e in list_names if to_avoid not in e]
     print "List of selected files: "
     print list_names

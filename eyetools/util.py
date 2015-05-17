@@ -1,16 +1,14 @@
 import numpy as np
-import sklearn.neighbors as sk
-from sklearn.grid_search import GridSearchCV
 import scipy.stats as sc
 import pandas as pd
 from scipy.interpolate import interp1d
-import scipy  
-import scikits.bootstrap as bootstrap
+import scipy
+#import scikits.bootstrap as bootstrap
 
 def removeRT(tab, limsup = 300):
     ##print "reaction time filter: <", limsup
-    selection_start = (tab.marker == 1) 
-    selection_ON = (tab.marker == 0) 
+    selection_start = (tab.marker == 1)
+    selection_ON = (tab.marker == 0)
     RT = tab.ix[selection_start, "time"].values[:] - tab.ix[selection_ON, "time"].values[:]
     #print RT
     if RT > limsup:
@@ -19,7 +17,7 @@ def removeRT(tab, limsup = 300):
         return tab
 
 def getHalfDistribution(halfdist, tab):
-    selectDistractor = (tab["TRIAL_TYPE"].values == 0)  
+    selectDistractor = (tab["TRIAL_TYPE"].values == 0)
     selection_end = (tab.marker == 2) & selectByHalfDistance(tab, halfdist)\
     & selectDistractor
     selection_start = (tab.marker == 1) & selectByHalfDistance(tab, halfdist)\
@@ -28,13 +26,13 @@ def getHalfDistribution(halfdist, tab):
                         - tab.ix[selection_start, ["xp","yp"]].values[:]
     target_dir = tab.ix[selection_end, ["S1_DIR"]].values[:]
     data_mirroted = mirrorConditions(target_dir, data_driftcorrected)
-    
+
     #RT = tab.ix[selection_start, "time"].values[:] - tab.ix[selection_ON, "time"].values[:]
-    
-    
+
+
     per_overzero = sum(data_mirroted[:,1]>0)/float(len(data_mirroted[:,1]))
     #per_underzero = sum(data_mirroted[:,1]<0)/float(len(data_mirroted[:,1]))
-    
+
     return per_overzero #, per_underzero
 
 def getMirrotedData(halfdist, tab, xandy=False):
@@ -43,18 +41,18 @@ def getMirrotedData(halfdist, tab, xandy=False):
 
     data_driftcorrected = tab.ix[selection_end, ["xp","yp"]].values[:]\
                         - tab.ix[selection_start, ["xp","yp"]].values[:]
-       
+
     target_dir = tab.ix[selection_end, ["S1_DIR"]].values[:]
     ## let's just take Y-axis:
     if (xandy == False):
         data_mirroted = mirrorConditions(target_dir, data_driftcorrected)[:,1]
     else:
         data_mirroted = mirrorConditions(target_dir, data_driftcorrected)
-    
+
     c = tab.ix[selection_end, ["TRIAL_TYPE"]].values[:]
     c = c.reshape(len(c))
     return data_mirroted, c ## c is a selector
-    
+
 
 def getDriftCorrectedData(halfdist, tab, xandy=False):
     selection_end = (tab.marker == 2) & selectByHalfDistance(tab, halfdist)
@@ -65,8 +63,8 @@ def getDriftCorrectedData(halfdist, tab, xandy=False):
 
     c = tab.ix[selection_end, ["TRIAL_TYPE"]].values[:]
     c = c.reshape(len(c))
-    return data_driftcorrected, c 
-    
+    return data_driftcorrected, c
+
 def findLocalMaximum(x, ycurve):
     b = ycurve[1:] < ycurve[:-1]
     c = ycurve[1:] > ycurve[:-1]
@@ -96,7 +94,7 @@ def selectByHalfDistance(df, halfdist, section = "both", stimulus = "S1"): ## re
         return selectRight
     else:
         return 0
-  
+
 def mirrorConditions(targ_dir, pos, section="all"): ## data has to be centered on zero
     new_pos = np.array(pos)
     if len(targ_dir.shape)>1:
@@ -273,7 +271,7 @@ def meanTraj0(grouped):
     return meanTrajectory, stdTrajectory, k
 
 def meanTraj(grouped, dlist = ["xp", "yp"], bootstrap = False):
-    """ Compute the average trajectory of a bench of trajectories. It normalized the trajectories over time before to perform the averaging... 
+    """ Compute the average trajectory of a bench of trajectories. It normalized the trajectories over time before to perform the averaging...
     Be carefull, the option Bootstrap work only when there one dimension to average, and it changes the output format of stdTrajectories"""
     trajectories = -1
     k = 0
@@ -304,7 +302,7 @@ def meanTraj(grouped, dlist = ["xp", "yp"], bootstrap = False):
     stdTrajectory = pd.DataFrame(np.nanstd(trajectories, axis=2),columns=["time"]+dlist)
     print "first loop passed"
     return meanTrajectory, stdTrajectory, k
-    
+
 def appendToACube(cube, new_slice):
     if (cube.shape[0] < new_slice.shape[0]):
         ## ^- we need to check that the array is big enough as we didnt normalized the time
@@ -323,55 +321,55 @@ def appendToACube(cube, new_slice):
         correct_size[0:new_slice.shape[0],:] = new_slice
         new_slice = correct_size
     return np.dstack((cube, new_slice))
-    
-def meanTraj1D(grouped, dlist = ["xp"], bootstraping = False, aligned = False):
-    """ Compute the average trajectory of a bench of trajectories. It normalized the trajectories over time before to perform the averaging... 
-    Be carefull, the option Bootstrap work only when there one dimension to average, and it changes the output format of stdTrajectories"""
-    trajectories = -1
-    k = 0
-    for name, data in grouped:
-        #print trajectories
-        #print data
-        print "\r Iteration ", k,
-        if np.isnan(data[dlist[0]].iloc[0]):
-            print "NaN found!"
-            continue
-        if aligned == False:
-            f = interp1d(data["time"].values, data[dlist].values, kind= "linear", axis=0)
-            norm_time = np.linspace(data["time"].min(),data["time"].max(), 100)
-            new_data = np.hstack((np.arange(100)[:,np.newaxis],f(norm_time)))
-        else:
-            new_data = np.hstack((data["time"].values[:,np.newaxis], data[dlist].values))
-            new_data[:,0] -= new_data[0,0]
-        #print new_data
-        if k == 0:
-            trajectories = new_data
-        else:
-            if (aligned == True):
-                trajectories = appendToACube(trajectories, new_data) ## safer
-            else:
-                trajectories = np.dstack((trajectories, new_data)) ## quicker and no need to be safe
-        k+=1
-    #print meanTrajectory
-    ## trajectories should here looks like: (time, dlist, trials)
-    trajectories = trajectories.astype(float)
-    k = np.sum(1-np.isnan(trajectories[0,1,:]))
-    print "total trials:", k
-    #print trajectories
-    #raw_input("wait...")
-    meanTrajectory = pd.DataFrame(np.nanmean(trajectories, axis=2),columns=["time"]+dlist)
-    if bootstraping == False:
-        print "Compute the usual standard deviation..."
-        stdTrajectory = np.nanstd(trajectories[:,1,:], axis = 1)*1.96/np.sqrt(np.sum(1-np.isnan(trajectories[:,0,:]), axis=1))
-        stdTrajectory = np.vstack((meanTrajectory.iloc[:,1] + stdTrajectory, meanTrajectory.iloc[:,1] -stdTrajectory))
-        stdTrajectory = pd.DataFrame(stdTrajectory.T, columns = ["CI_inf", "CI_sup"])
-    else:
-        print "Start Bootstrap of the confidence interval..."
-        stdTrajectory = np.array([bootstrap.ci(trajectories[i+1, 1, :], statfunction = np.nanmean, method="bca") for i in range(trajectories.shape[0]-2) ])
-        stdTrajectory = pd.DataFrame(np.vstack(((0,0), stdTrajectory, (0,0))), columns = ["CI_inf", "CI_sup"])
-  
-    # compute 95% confidence intervals around the mean  
-    #CIs = bootstrap.ci(data=treatment1, statfunction=scipy.mean) 
-    #print meanTrajectory["trial type"]
-    print "first loop passed"
-    return meanTrajectory, stdTrajectory, k
+
+# def meanTraj1D(grouped, dlist = ["xp"], bootstraping = False, aligned = False):
+#     """ Compute the average trajectory of a bench of trajectories. It normalized the trajectories over time before to perform the averaging...
+#     Be carefull, the option Bootstrap work only when there one dimension to average, and it changes the output format of stdTrajectories"""
+#     trajectories = -1
+#     k = 0
+#     for name, data in grouped:
+#         #print trajectories
+#         #print data
+#         print "\r Iteration ", k,
+#         if np.isnan(data[dlist[0]].iloc[0]):
+#             print "NaN found!"
+#             continue
+#         if aligned == False:
+#             f = interp1d(data["time"].values, data[dlist].values, kind= "linear", axis=0)
+#             norm_time = np.linspace(data["time"].min(),data["time"].max(), 100)
+#             new_data = np.hstack((np.arange(100)[:,np.newaxis],f(norm_time)))
+#         else:
+#             new_data = np.hstack((data["time"].values[:,np.newaxis], data[dlist].values))
+#             new_data[:,0] -= new_data[0,0]
+#         #print new_data
+#         if k == 0:
+#             trajectories = new_data
+#         else:
+#             if (aligned == True):
+#                 trajectories = appendToACube(trajectories, new_data) ## safer
+#             else:
+#                 trajectories = np.dstack((trajectories, new_data)) ## quicker and no need to be safe
+#         k+=1
+#     #print meanTrajectory
+#     ## trajectories should here looks like: (time, dlist, trials)
+#     trajectories = trajectories.astype(float)
+#     k = np.sum(1-np.isnan(trajectories[0,1,:]))
+#     print "total trials:", k
+#     #print trajectories
+#     #raw_input("wait...")
+#     meanTrajectory = pd.DataFrame(np.nanmean(trajectories, axis=2),columns=["time"]+dlist)
+#     if bootstraping == False:
+#         print "Compute the usual standard deviation..."
+#         stdTrajectory = np.nanstd(trajectories[:,1,:], axis = 1)*1.96/np.sqrt(np.sum(1-np.isnan(trajectories[:,0,:]), axis=1))
+#         stdTrajectory = np.vstack((meanTrajectory.iloc[:,1] + stdTrajectory, meanTrajectory.iloc[:,1] -stdTrajectory))
+#         stdTrajectory = pd.DataFrame(stdTrajectory.T, columns = ["CI_inf", "CI_sup"])
+#     else:
+#         print "Start Bootstrap of the confidence interval..."
+#         stdTrajectory = np.array([bootstrap.ci(trajectories[i+1, 1, :], statfunction = np.nanmean, method="bca") for i in range(trajectories.shape[0]-2) ])
+#         stdTrajectory = pd.DataFrame(np.vstack(((0,0), stdTrajectory, (0,0))), columns = ["CI_inf", "CI_sup"])
+#
+#     # compute 95% confidence intervals around the mean
+#     #CIs = bootstrap.ci(data=treatment1, statfunction=scipy.mean)
+#     #print meanTrajectory["trial type"]
+#     print "first loop passed"
+#     return meanTrajectory, stdTrajectory, k

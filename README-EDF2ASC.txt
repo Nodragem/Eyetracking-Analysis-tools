@@ -1,3 +1,7 @@
+To convert EDF files to a HDF5 file, you will need the edf2asc.exe provided by Eyelink.
+
+Here the help output of the software, in case you have specific requirement.
+
 USAGE: edf2asc.exe  [options] <input .edf file>
 OPTIONS: -p <path> writes output with same name to <path> directory
          -p *.<ext> writes output of same name with new extension
