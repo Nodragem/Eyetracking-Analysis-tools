@@ -18,17 +18,17 @@ Each Dataframe in the HDF5 file needs to represent a block of trials. For instan
 
 The column names of each dataframe should be the same and should ideally looks like that:
 
-| TRIAL_ID |	Fixation0	| Fixation0_DIR |	Fixation0_ECC |	S11	| S11_DIR	|S11_ECC | TRIAL_CODE |	TRIAL_TYPE |	ps	| time	| vx	| vy	| xp |	yp |
-|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
-| 1.0 |	ON	| 0.0	| 0.0|	OFF |	158.0 |	7.0 | 11111.0 |	2.0 |	6125.0 |	0.0 |	65.1 |	-26.8 |	447.4 |	648.6 |
-|...|...|...|...|...|...|...|...|...|...|...|...|...|...|...|
+| TRIAL_ID | Fixation0 | Fixation0_DIR | Fixation0_ECC | S11 | S11_DIR | S11_ECC | TRIAL_CODE | TRIAL_TYPE | ps | time | vx | vy | xp | yp |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.0 | ON | 0.0 | 0.0 | OFF | 158.0 | 7.0 | 11111.0 | 2.0 | 6125.0 | 0.0 | 65.1 | -26.8 | 447.4 | 648.6 |
+|...|...|...|...|...|...|...|...|...|...|...|...|...|...|
 
 Where S1 and Fixation are the user-defined (defined by you) name of Stimuli which are used during the experiment. This nomenclature is actually used by the ParadigmTools library. More details on the nomenclature can be found in that library doc.
 
 Note that the ordering of the columns does not matter and the only mandatory columns are:
 
-|TRIAL_ID|	Fixation0 |	TRIAL_TYPE|	time	|vx	|vy	|xp|	yp|
-|-|-|-|-|-|-|-|-|
+| TRIAL_ID | Fixation0 | TRIAL_TYPE | time | vx | vy | xp | yp |
+|----|----|----|----|----|----|----|----|
 |...|...|...|...|...|...|...|...|
 
 *Fixation0* will be used to defined the first marker in *CleaningData*: the fixation offset, which is usefull to measure reaction time. The name of *Fixation0* can actually be change in the code source. I may improve the code to let the user chose the stimulus offset or event he/she want to use as the first marker.
@@ -42,7 +42,7 @@ It opens the HDF5 file that has been specified in the *currentpath.ph* in the ro
 The program will detect the offset of the fixation, the onset and offset of saccades for each trials and create a table of events. It adds the event table to a new HDF5 file named *name-seq.h5*. The table of event will looks like that:
 
 |TRIAL_ID|TRIAL_TYPE|TRIAL_CODE|time|xp|yp|marker|rejected|
-|--|-|--|-|-|-|-|-|
+|----|----|----|----|----|----|----|----|
 |1.0|2.0|11111.0|1965.0|626.8|523.9|0|False|
 |1.0|2.0|11111.0|2176.0|626.2|524.5|1|False|
 |1.0|1.0|11211.0|2244.0|330.9|686.7|2|False|
@@ -66,7 +66,7 @@ While you are viewing the trials, note that you can right-click on a plot to enl
 
 #### Command Summary:
 | Command | Description |
-|-|-|
+|----|----|
 | `A` / `D`| Previous/next page
 | left-click| select a trial|
 | right-click| enlarge the clicked trial|
