@@ -58,6 +58,8 @@ The marker 0 correspond to the offset of the fixation stimulus.
 ### Check-out Windows and Rejection
 After that, the program opens a matplotlib windows which plots the eye positions along time for each trials in the dataframe.
 
+![](./DataCleaningWindow.png)
+
 One page contains 50x10 plots (trials): use `D` and `A` to navigate through pages. On each trial, the program marks the fixation offset, the saccade onsets and offsets, for you to check out its job. According to the position of the markers, the program will automatically suspect some trials to be bad trials and color them in a reddish background.
 
 While you are navigating through the trials, you can select a trial by clicking on it and tag it as rejected with the space bar. Once you tagged all the trials you want to tag as rejected, press CTRL + S to save the tags. The columns ["rejected"] is updated.
